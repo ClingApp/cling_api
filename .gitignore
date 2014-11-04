@@ -73,3 +73,6 @@ target/
 # SQLite
 # For debug only
 app.db
+
+# Idea files
+.idea/
