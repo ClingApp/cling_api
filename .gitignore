@@ -5,9 +5,6 @@
 #   git config --global core.excludesfile '~/.gitignore_global'
 
 
-# Ignore all logfiles and tempfiles.
-/log/*.log
-/tmp
 
 # Extra files to ignore
 doc/
@@ -60,15 +57,6 @@ coverage.xml
 # Translations
 *.mo
 *.pot
-
-# Django stuff:
-*.log
-
-# Sphinx documentation
-docs/_build/
-
-# PyBuilder
-target/
 
 # SQLite
 # For debug only
