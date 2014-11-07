@@ -1,7 +1,7 @@
 import os
+import sys
 
 from flask.ext.httpauth import HTTPBasicAuth
-import sys
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 
@@ -45,10 +45,54 @@ if not app.config['DEBUG']:
 # def not_found(error):
 # return render_template('404.html'), 404
 
+# Users module
 from app.users.views import mod as users_module
-
 app.register_blueprint(users_module)
 
+# Products module
+from app.products.views import mod as products_module
+
+app.register_blueprint(products_module)
+
+# Categories module
+from app.categories.views import mod as categories_module
+
+app.register_blueprint(categories_module)
+
+# Reviews module
+from app.reviews.views import mod as reviews_module
+
+app.register_blueprint(reviews_module)
+
+# Stickers module
+from app.stickers.views import mod as stickers_module
+
+app.register_blueprint(stickers_module)
+
+# Comments module
+from app.comments.views import mod as comments_module
+
+app.register_blueprint(comments_module)
+
+# Likes module
+from app.likes.views import mod as likes_module
+
+app.register_blueprint(likes_module)
+
+# Ratings module
+from app.ratings.views import mod as ratings_module
+
+app.register_blueprint(ratings_module)
+
+# Favorites module
+from app.favorites.views import mod as favorites_module
+
+app.register_blueprint(favorites_module)
+
+# Subscribes module
+from app.subscribes.views import mod as subscribes_module
+
+app.register_blueprint(subscribes_module)
 
 # Later on you'll import the other blueprints the same way:
 #from app.comments.views import mod as commentsModule
