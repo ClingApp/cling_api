@@ -1,9 +1,16 @@
+import logging
+from logging.handlers import RotatingFileHandler
 import os
 import sys
 
 from flask.ext.httpauth import HTTPBasicAuth
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
+
+
+# #######################
+# Init                  #
+# #######################
 
 
 app = Flask(__name__)
@@ -41,9 +48,9 @@ def install_secret_key(app, filename='secret_key'):
 if not app.config['DEBUG']:
     install_secret_key(app)
 
-# @app.errorhandler(404)
-# def not_found(error):
-# return render_template('404.html'), 404
+# #######################
+# Views                 #
+# #######################
 
 # Users module
 from app.users.views import mod as users_module
@@ -94,8 +101,19 @@ from app.subscribes.views import mod as subscribes_module
 
 app.register_blueprint(subscribes_module)
 
-# Later on you'll import the other blueprints the same way:
-#from app.comments.views import mod as commentsModule
-#from app.posts.views import mod as postsModule
-#app.register_blueprint(commentsModule)
-#app.register_blueprint(postsModule)
+# #######################
+# Logs Handler          #
+# #######################
+
+
+formatter = logging.Formatter("%(asctime)s\t%(name)s\t%(message)s")
+
+error_handler = RotatingFileHandler('app/logs/error.log', maxBytes=10000, backupCount=1)
+error_handler.setLevel(logging.ERROR)
+error_handler.setFormatter(formatter)
+app.logger.addHandler(error_handler)
+
+info_handler = RotatingFileHandler('app/logs/info.log', maxBytes=10000, backupCount=1)
+info_handler.setLevel(logging.INFO)
+info_handler.setFormatter(formatter)
+app.logger.addHandler(info_handler)
