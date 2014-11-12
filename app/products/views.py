@@ -7,7 +7,7 @@ from app.users.model import User
 
 mod = Blueprint('products', __name__, url_prefix='/api/products')
 
-
+# {"title":"smth","price":"3000","description":"","user":"1"}
 @mod.route('/', methods=['POST'])
 def new_product():
     title = request.json.get('title')
@@ -20,7 +20,7 @@ def new_product():
     product = Product(title=title, price=price, description=description, user_id=user_instance.id)
     db.session.add(product)
     db.session.commit()
-    return (jsonify({'username': user_instance.username, 'title': product.title}), 201,
+    return (jsonify({'email': user_instance.email, 'title': product.title}), 201,
             {'Location': url_for('.get_product', id=product.id, _external=True)})
 
 
@@ -30,3 +30,11 @@ def get_product(id):
     if not product:
         abort(400)  # product with `id` isn't exist
     return jsonify(product)
+
+
+@mod.route('/<int:id>', methods=['DELETE'])
+def delete_product(id):
+    product = Product.query.get(id)
+    if not product:
+        abort(400)  # product with `id` isn't exist
+    return (jsonify({'data': 'Hello, %s!' % g.user.email}), 200)
