@@ -1,4 +1,9 @@
 from app import db
+from app.categories.model import Category
+from app.comments.model import Comment
+from app.favorites.model import Favorite
+from app.likes.model import Like
+from app.stickers.model import Sticker
 
 
 products_categories = db.Table('products_categories',
@@ -26,10 +31,10 @@ class Product(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     # links
-    comments = db.relationship('Comment', backref='products', lazy='dynamic')
-    likes = db.relationship('Like', backref='products', lazy='dynamic')
-    favorites = db.relationship('Favorite', backref='products', lazy='dynamic')
-    categories = db.relationship('Category', secondary=products_categories,
+    comments = db.relationship(Comment, backref='products', lazy='dynamic')
+    likes = db.relationship(Like, backref='products', lazy='dynamic')
+    favorites = db.relationship(Favorite, backref='products', lazy='dynamic')
+    categories = db.relationship(Category, secondary=products_categories,
                                  backref=db.backref('products', lazy='dynamic'))
-    stickers = db.relationship('Sticker', secondary=products_stickers,
+    stickers = db.relationship(Sticker, secondary=products_stickers,
                                backref=db.backref('products', lazy='dynamic'))

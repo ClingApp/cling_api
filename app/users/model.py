@@ -3,6 +3,13 @@ from itsdangerous import (TimedJSONWebSignatureSerializer
                           as Serializer, BadSignature, SignatureExpired)
 
 from app import db, app
+from app.comments.model import Comment
+from app.favorites.model import Favorite
+from app.products.model import Product
+from app.ratings.model import Rating
+from app.reviews.model import Review
+from app.likes.model import Like
+from app.subscribes.model import Subscribe
 
 
 class User(db.Model):
@@ -27,17 +34,29 @@ class User(db.Model):
     registered_on = db.Column(db.DateTime)
 
     # links
-    products = db.relationship('Product', backref='users', lazy='dynamic')
-    reviews_to_user = db.relationship('Review', backref='users', lazy='dynamic')
-    reviews_from_user = db.relationship('Review', backref='users', lazy='dynamic')
-    comments = db.relationship('Comment', backref='users', lazy='dynamic')
-    likes = db.relationship('Like', backref='users', lazy='dynamic')
-    favorites = db.relationship('Favorite', backref='users', lazy='dynamic')
-    ratings_to_user = db.relationship('Rating', backref='users', lazy='dynamic')
-    ratings_from_user = db.relationship('Rating', backref='users', lazy='dynamic')
-    subscribes_to_user = db.relationship('Subscribe', backref='users', lazy='dynamic')
-    subscribes_from_user = db.relationship('Subscribe', backref='users', lazy='dynamic')
+    products = db.relationship(Product, backref='users', lazy='dynamic')
+    # mby need to add `viewonly=true` attr
+    reviews = db.relationship(Review, backref='reviews', foreign_keys="[Review.user_from_id, Review.user_from_id]",
+                              viewonly=True)
+    # reviews_to_user = db.relationship(Review, backref='users', lazy='dynamic')
+    # reviews_from_user = db.relationship(Review, backref='users', lazy='dynamic')
+    comments = db.relationship(Comment, backref='users', lazy='dynamic')
+    likes = db.relationship(Like, backref='users', lazy='dynamic')
+    favorites = db.relationship(Favorite, backref='users', lazy='dynamic')
 
+    rating = db.relationship(Rating, backref="ratings", foreign_keys="[Rating.user_from_id, Rating.user_from_id]",
+                             viewonly=True)
+    # ratings_to_user = db.relationship(Rating, backref='users', lazy='dynamic')
+    # ratings_from_user = db.relationship(Rating, backref='users', lazy='dynamic')
+    # mby need to add `viewonly=true`
+    # subscribe = db.relationship(Subscribe, backref='subscribe',
+    # foreign_keys="[Subscribe.user_from_id, Subscribe.user_to_id]", viewonly=True)
+    # subscribes_to_user = db.relationship(Subscribe, backref='users', lazy='dynamic')
+    # subscribes_from_user = db.relationship(Subscribe, backref='users', lazy='dynamic')
+    subscribes_to_user = db.relationship(Subscribe, backref='users', lazy='dynamic')
+    subscribes_from_user = db.relationship(Subscribe, backref='users', lazy='dynamic')
+
+    # helper methods
     def hash_password(self, password):
         self.password = pwd_context.encrypt(password)
 
