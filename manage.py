@@ -1,25 +1,23 @@
 #!/usr/bin/env python
 
-from flask import jsonify
+from flask.ext.script import Manager
+from flask.ext.script.commands import ShowUrls, Clean
 
-from app import app
-
-
-@app.route('/api', methods=['GET'])
-def this_func():
-    """This is a function. It does nothing."""
-    return jsonify({'result': ''})
+from app import app, db
 
 
-@app.route('/api/help', methods=['GET'])
-def help():
-    """Print available functions."""
-    func_list = {}
-    for rule in app.url_map.iter_rules():
-        if rule.endpoint != 'static':
-            func_list[rule.rule] = app.view_functions[rule.endpoint].__doc__
-    return jsonify(func_list)
+manager = Manager(app)
+manager.add_command("show-urls", ShowUrls())
+manager.add_command("clean", Clean())
 
+
+@manager.command
+def db():
+    """ Creates a database with all of the tables defined in
+        your Alchemy models
+    """
+
+    db.create_all()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    manager.run()
