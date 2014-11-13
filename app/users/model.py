@@ -9,6 +9,9 @@ from app.comments.model import Comment
 from app.favorites.model import Favorite
 from app.products.model import Product
 from app.likes.model import Like
+from app.ratings.model import Rating
+from app.reviews.model import Review
+from app.subscribes.model import Subscribe
 
 
 class User(db.Model):
@@ -35,15 +38,15 @@ class User(db.Model):
 
     # links
     products = db.relationship(Product, backref='users', lazy='dynamic')
-    reviews_from_user = db.relationship("Review", foreign_keys="[Review.user_to_id]")
-    reviews_from_user = db.relationship("Review", foreign_keys="[Review.user_from_id]")
+    reviews_to_user = db.relationship(Review, foreign_keys="[Review.user_to_id]")
+    reviews_from_user = db.relationship(Review, foreign_keys="[Review.user_from_id]")
     comments = db.relationship(Comment, backref='users', lazy='dynamic')
     likes = db.relationship(Like, backref='users', lazy='dynamic')
     favorites = db.relationship(Favorite, backref='users', lazy='dynamic')
-    ratings_to_user = db.relationship("Rating", foreign_keys="[Rating.user_to_id]")
-    ratings_from_user = db.relationship("Rating", foreign_keys="[Rating.user_from_id]")
-    subscribes_to_user = db.relationship("Subscribe", foreign_keys="[Subscribe.user_to_id]")
-    subscribes_from_user = db.relationship("Subscribe", foreign_keys="[Subscribe.user_from_id]")
+    ratings_to_user = db.relationship(Rating, foreign_keys="[Rating.user_to_id]")
+    ratings_from_user = db.relationship(Rating, foreign_keys="[Rating.user_from_id]")
+    subscribes_to_user = db.relationship(Subscribe, foreign_keys="[Subscribe.user_to_id]")
+    subscribes_from_user = db.relationship(Subscribe, foreign_keys="[Subscribe.user_from_id]")
 
     def __init__(self, email, first_name, last_name, phone, city):
         self.email = email
