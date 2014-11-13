@@ -2,6 +2,7 @@ from flask import abort, request, jsonify, g, url_for, Blueprint
 
 from app import db, auth
 from app.users.model import User
+from app.helpers import *
 
 
 mod = Blueprint('users', __name__, url_prefix='/api')
@@ -37,10 +38,8 @@ def new_user():
     user.hash_password(password)
     db.session.add(user)
     db.session.commit()
-    information = {}
-    for columnName in User.__table__.columns.keys():
-        information[columnName] = getattr(user, columnName)
-    return (jsonify(result=information), 201,
+    information = get_info(user, User, not_used='password')
+    return (jsonify({'status': 200, 'result': information}), 201,
             {'Location': url_for('.get_user', id=user.id, _external=True)})
 
 
@@ -64,21 +63,17 @@ def update_user(id):
         user.city = request.json.get('city')
     db.session.commit()
     user = User.query.get(id)
-    information = {}
-    for columnName in User.__table__.columns.keys():
-        information[columnName] = getattr(user, columnName)
-    return jsonify(result=information), 200
+    information = get_info(user, User, not_used='password')
+    return jsonify({'status': 200, 'result': information}), 200
 
 
 @mod.route('/users', methods=['GET'])
 def get_all_users():
     users = []
     for user in User.query.filter_by(is_deleted=0):
-        information = {}
-        for columnName in User.__table__.columns.keys():
-            information[columnName] = getattr(user, columnName)
+        information = get_info(user, User, not_used='password')
         users.append(information)
-    return jsonify(results=users), 200
+    return jsonify({'status': 200, 'result': users}), 200
 
 
 @mod.route('/users/<int:id>', methods=['GET'])
@@ -86,10 +81,8 @@ def get_user(id):
     user = User.query.get(id)
     if not user:
         abort(400)
-    information = {}
-    for columnName in User.__table__.columns.keys():
-        information[columnName] = getattr(user, columnName)
-    return jsonify(result=information), 200
+    information = get_info(user, User, not_used='password')
+    return jsonify({'status': 200, 'result': information}), 200
 
 
 @mod.route('/users/<int:id>', methods=['DELETE'])
@@ -99,7 +92,7 @@ def delete_user(id):
         abort(400)
     db.session.delete(user)
     db.session.commit()
-    return jsonify(), 204
+    return jsonify({'status': 200}), 200
 
 
 @mod.route('/token')
