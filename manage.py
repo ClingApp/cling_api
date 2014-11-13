@@ -12,7 +12,7 @@ manager.add_command("clean", Clean())
 
 
 @manager.command
-def db():
+def create_db():
     """ Creates a database with all of the tables defined in
         your Alchemy models
     """
