@@ -1,7 +1,7 @@
 from flask import Blueprint, abort, jsonify, request, url_for
 
 from app import db
-from app.helpers import get_info
+from app.helpers import response_builder
 from app.products.model import Product
 from app.users.model import User
 
@@ -41,7 +41,7 @@ def update_product(id):
         product.image = request.json.get('image')
     db.session.commit()
     product = Product.query.get(id)
-    information = get_info(product, Product, [])
+    information = response_builder(product, Product, [])
     return jsonify({'status': 200, 'result': information}), 200
 
 
@@ -50,7 +50,7 @@ def get_product(id):
     product = Product.query.get(id)
     if not product:
         abort(400)  # product with `id` isn't exist
-    information = get_info(product, Product, [])
+    information = response_builder(product, Product, [])
     return jsonify({'status': 200, 'result': information}), 200
 
 
@@ -58,7 +58,7 @@ def get_product(id):
 def get_all_products():
     products = []
     for product in Product.query.filter_by(is_deleted=0):
-        information = get_info(product, Product, not_used='password')
+        information = response_builder(product, Product, excluded='password')
         products.append(information)
     return jsonify({'status': 200, 'result': products}), 200
 
