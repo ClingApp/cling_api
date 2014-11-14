@@ -21,6 +21,7 @@ def verify_password(email_or_token, password):
     return True
 
 
+# need validate email ^(?("")("".+?""@)|(([0-9a-zA-Z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-zA-Z])@))(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,6}))$
 # {"email": "admin@mail.ru", "password": "password"}
 @mod.route('/users', methods=['POST'])
 def new_user():
@@ -38,7 +39,7 @@ def new_user():
     user.hash_password(password)
     db.session.add(user)
     db.session.commit()
-    information = get_info(user, User, not_used='password')
+    information = response_builder(user, User, excluded='password')
     return (jsonify({'status': 200, 'result': information}), 201,
             {'Location': url_for('.get_user', id=user.id, _external=True)})
 
@@ -63,7 +64,7 @@ def update_user(id):
         user.city = request.json.get('city')
     db.session.commit()
     user = User.query.get(id)
-    information = get_info(user, User, not_used='password')
+    information = response_builder(user, User, excluded='password')
     return jsonify({'status': 200, 'result': information}), 200
 
 
@@ -71,7 +72,7 @@ def update_user(id):
 def get_all_users():
     users = []
     for user in User.query.filter_by(is_deleted=0):
-        information = get_info(user, User, not_used='password')
+        information = response_builder(user, User, excluded='password')
         users.append(information)
     return jsonify({'status': 200, 'result': users}), 200
 
@@ -81,10 +82,11 @@ def get_user(id):
     user = User.query.get(id)
     if not user:
         abort(400)
-    information = get_info(user, User, not_used='password')
+    information = response_builder(user, User, excluded='password')
     return jsonify({'status': 200, 'result': information}), 200
 
 
+# User can delete only himself.
 @mod.route('/users/<int:id>', methods=['DELETE'])
 def delete_user(id):
     user = User.query.get(id)
@@ -100,9 +102,3 @@ def delete_user(id):
 def get_auth_token():
     token = g.user.generate_auth_token(600)
     return jsonify({'token': token.decode('ascii'), 'duration': 600})
-
-
-@mod.route('/resource')
-@auth.login_required
-def get_resource():
-    return jsonify({'data': 'Hello, %s!' % g.user.email})
