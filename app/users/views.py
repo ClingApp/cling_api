@@ -39,7 +39,7 @@ def new_user():
     user.hash_password(password)
     db.session.add(user)
     db.session.commit()
-    information = response_builder(user, User, excluded='password')
+    information = response_builder(user, User, excluded=['password'])
     return (jsonify({'status': 200, 'result': information}), 201,
             {'Location': url_for('.get_user', id=user.id, _external=True)})
 
@@ -64,7 +64,7 @@ def update_user(id):
         user.city = request.json.get('city')
     db.session.commit()
     user = User.query.get(id)
-    information = response_builder(user, User, excluded='password')
+    information = response_builder(user, User, excluded=['password'])
     return jsonify({'status': 200, 'result': information}), 200
 
 
@@ -72,7 +72,7 @@ def update_user(id):
 def get_all_users():
     users = []
     for user in User.query.filter_by(is_deleted=0):
-        information = response_builder(user, User, excluded='password')
+        information = response_builder(user, User, excluded=['password'])
         users.append(information)
     return jsonify({'status': 200, 'result': users}), 200
 
@@ -82,7 +82,7 @@ def get_user(id):
     user = User.query.get(id)
     if not user:
         abort(400)
-    information = response_builder(user, User, excluded='password')
+    information = response_builder(user, User, excluded=['password'])
     return jsonify({'status': 200, 'result': information}), 200
 
 
