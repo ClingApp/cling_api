@@ -3,8 +3,8 @@
 from flask.ext.script import Manager, Server
 from flask.ext.script.commands import ShowUrls, Clean
 
-from app import app, db
-from app.users.model import User
+from app.api import app, db
+from app.api.users.model import User
 
 
 manager = Manager(app)
