@@ -14,3 +14,8 @@ DATABASE_CONNECT_OPTIONS = {}
 
 THREADS_PER_PAGE = 8  # need more tests
 # JSON_SORT_KEYS = False
+
+# Uploading
+UPLOAD_FOLDER = '/app/static/'
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB  raise RequestEntityTooLarge

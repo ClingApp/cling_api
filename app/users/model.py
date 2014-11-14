@@ -34,7 +34,7 @@ class User(db.Model):
     last_login_ip = db.Column(db.String(100))
     current_login_ip = db.Column(db.String(100))
     login_count = db.Column(db.Integer)
-    registered_on = db.Column(db.DateTime)
+    registered_on = db.Column(db.DateTime, default=datetime.utcnow())
 
     # links
     products = db.relationship(Product, backref='users', lazy='dynamic')
@@ -54,7 +54,6 @@ class User(db.Model):
         self.last_name = last_name
         self.phone = phone
         self.city = city
-        self.registered_on = datetime.utcnow()
 
     # helper methods
     def hash_password(self, password):

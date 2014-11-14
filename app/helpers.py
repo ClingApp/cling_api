@@ -1,7 +1,10 @@
-def response_builder(object, entity, excluded=[]):
+from app import app
+
+
+def response_builder(current_object, entity, excluded=[]):
     """
     Helps to build appropriate response, parsing given object and included/excluded needed fields
-    :param object: current object, from which we want to build a response
+    :param current_object: current object, from which we want to build a response
     :param entity: global entity the given object belongs to.
     :param excluded: array of fields we do not want to see in response.
     :return: return a dict with needed fields
@@ -9,5 +12,14 @@ def response_builder(object, entity, excluded=[]):
     result = {}
     for columnName in entity.__table__.columns.keys():
         if columnName not in excluded:
-            result[columnName] = getattr(object, columnName)
+            result[columnName] = getattr(current_object, columnName)
     return result
+
+
+def allowed_file(filename):
+    """
+    Check if loaded file match the cases.
+    :param filename: the full file name with '.*' extension
+    :return: True if matches or not
+    """
+    return '.' in filename and filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']

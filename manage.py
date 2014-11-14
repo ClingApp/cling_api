@@ -23,12 +23,14 @@ def make_shell_context():
 
 
 @manager.command
-def create_db():
+def syncdb():
     """ Creates a database with all of the tables defined in
         your Alchemy models
     """
 
+    db.drop_all()
     db.create_all()
+
 
 if __name__ == '__main__':
     manager.run()
