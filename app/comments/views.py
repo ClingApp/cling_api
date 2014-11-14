@@ -1,7 +1,7 @@
 from flask import Blueprint, abort, jsonify, request
 
 from app import db
-from app.helpers import get_info
+from app.helpers import response_builder
 from app.comments.model import Comment
 
 mod = Blueprint('comments', __name__, url_prefix='/api/comments')
@@ -18,7 +18,7 @@ def new_comment():
     comment = Comment(text=text, user_id=user_id, product_id=product_id)
     db.session.add(comment)
     db.session.commit()
-    information = get_info(comment, Comment, [])
+    information = response_builder(comment, Comment)
     return jsonify({'status': 201, 'result': information}), 201
 
 
@@ -31,7 +31,7 @@ def update_comment(id):
         comment.text = request.json.get('text')
     db.session.commit()
     comment = Comment.query.get(id)
-    information = get_info(comment, Comment, [])
+    information = response_builder(comment, Comment)
     return jsonify({'status': 200, 'result': information}), 200
 
 
@@ -40,7 +40,7 @@ def get_comment(id):
     comment = Comment.query.get(id)
     if not comment:
         abort(400)  # comment with `id` isn't exist
-    information = get_info(comment, Comment, [])
+    information = response_builder(comment, Comment)
     return jsonify({'status': 200, 'result': information}), 200
 
 
@@ -48,7 +48,7 @@ def get_comment(id):
 def get_all_comments():
     comments = []
     for comment in Comment.query.filter_by(is_deleted=0):
-        information = get_info(comment, Comment, not_used='password')
+        information = response_builder(comment, Comment)
         comments.append(information)
     return jsonify({'status': 200, 'result': comments}), 200
 

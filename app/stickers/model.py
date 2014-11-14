@@ -9,5 +9,6 @@ class Sticker(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(250))
+    image = db.Column(db.Text)
     is_deleted = db.Column(db.Boolean, default=0)
     creation_date = db.Column(db.DateTime)

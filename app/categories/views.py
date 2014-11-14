@@ -1,7 +1,7 @@
 from flask import Blueprint, abort, jsonify, request
 
 from app import db
-from app.helpers import get_info
+from app.helpers import response_builder
 from app.categories.model import Category
 
 mod = Blueprint('categories', __name__, url_prefix='/api/categories')
@@ -16,7 +16,7 @@ def new_category():
     category = Category(title=title)
     db.session.add(category)
     db.session.commit()
-    information = get_info(category, Category, [])
+    information = response_builder(category, Category)
     return jsonify({'status': 201, 'result': information}), 201
 
 
@@ -29,7 +29,7 @@ def update_category(id):
         category.title = request.json.get('title')
     db.session.commit()
     category = Category.query.get(id)
-    information = get_info(category, Category, [])
+    information = response_builder(category, Category)
     return jsonify({'status': 200, 'result': information}), 200
 
 
@@ -38,7 +38,7 @@ def get_category(id):
     category = Category.query.get(id)
     if not category:
         abort(400)  # category with `id` isn't exist
-    information = get_info(category, Category, [])
+    information = response_builder(category, Category)
     return jsonify({'status': 200, 'result': information}), 200
 
 
@@ -46,7 +46,7 @@ def get_category(id):
 def get_all_categories():
     categories = []
     for category in Category.query.filter_by(is_deleted=0):
-        information = get_info(category, Category, not_used='password')
+        information = response_builder(category, Category)
         categories.append(information)
     return jsonify({'status': 200, 'result': categories}), 200
 

@@ -7,6 +7,7 @@ def response_builder(object, entity, excluded=[]):
     :return: return a dict with needed fields
     """
     result = {}
+    excluded.append('is_deleted')
     for columnName in entity.__table__.columns.keys():
         if columnName not in excluded:
             result[columnName] = getattr(object, columnName)
