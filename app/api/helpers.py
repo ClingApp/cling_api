@@ -1,4 +1,6 @@
 import app
+from app.api.products.model import Product
+from app.api.users.model import User
 
 
 def response_builder(current_object, entity, excluded=[]):
@@ -13,7 +15,16 @@ def response_builder(current_object, entity, excluded=[]):
     excluded.append('is_deleted')
     for columnName in entity.__table__.columns.keys():
         if columnName not in excluded:
-            result[columnName] = getattr(current_object, columnName)
+            if "product" in columnName:
+                product_id = getattr(current_object, columnName)
+                result["product"] = response_builder(Product.query.get(product_id), Product)
+            elif "user" in columnName:
+                user_id = getattr(current_object, columnName)
+                if columnName == "user_id":
+                    columnName = "user"
+                result[columnName] = response_builder(User.query.get(user_id), User, ["password"])
+            else:
+                result[columnName] = getattr(current_object, columnName)
     return result
 
 

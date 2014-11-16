@@ -1,4 +1,4 @@
-from flask import Blueprint, abort, jsonify, request
+from flask import Blueprint, jsonify, request
 
 from app.api import db
 from app.api.helpers import response_builder
@@ -15,12 +15,12 @@ def new_rating():
     user_from_id = request.json.get('user_from_id')
     user_to_id = request.json.get('user_to_id')
     if vote is None or user_from_id is None or user_to_id is None:
-        abort(400)  # missing arguments
+        return jsonify({'error_code': 400, 'result': 'not ok'}), 200  # missing arguments
     rating = Rating(vote=vote, user_from_id=user_from_id, user_to_id=user_to_id)
     db.session.add(rating)
     db.session.commit()
     information = response_builder(rating, Rating)
-    return jsonify({'status': 201, 'result': information}), 201
+    return jsonify({'error_code': 201, 'result': information}), 201
 
 
 @mod.route('/<int:id>', methods=['GET'])
@@ -31,14 +31,14 @@ def get_rating(id):
     for rating in Rating.query.filter_by(user_to_id=id):
         information = response_builder(User.query.get(rating.user_from_id), User, excluded=['password'])
         users.append(information)
-    return jsonify({'status': 200, 'amount': amount, 'users': users}), 200
+    return jsonify({'error_code': 200, 'amount': amount, 'users': users}), 200
 
 
 @mod.route('/<int:id>', methods=['DELETE'])
 def delete_rating(id):
     rating = Rating.query.get(id)
     if not rating:
-        abort(400)  # rating with `id` isn't exist
+        return jsonify({'error_code': 400, 'result': 'not ok'}), 200  # rating with `id` isn't exist
     db.session.delete(rating)
     db.session.commit()
-    return jsonify({'status': 200}), 200
+    return jsonify({'error_code': 200}), 200

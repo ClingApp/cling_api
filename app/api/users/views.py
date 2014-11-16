@@ -1,7 +1,6 @@
-from flask import abort, request, jsonify, g, url_for, Blueprint
+from flask import request, jsonify, g, url_for, Blueprint
 
 from app.api import db, auth
-from app.api.users.model import User
 from app.api.helpers import *
 
 
@@ -23,7 +22,7 @@ def verify_password(email_or_token, password):
 
 # need validate email ^(?("")("".+?""@)|(([0-9a-zA-Z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-zA-Z])@))(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,6}))$
 # {"email": "admin@mail.ru", "password": "password"}
-@mod.route('/users', methods=['POST'])
+@mod.route('/users/', methods=['POST'])
 def new_user():
     email = request.json.get('email')
     password = request.json.get('password')
@@ -32,15 +31,15 @@ def new_user():
     phone = request.json.get('phone')
     city = request.json.get('city')
     if email is None or password is None:
-        abort(400)  # missing arguments
+        return jsonify({'error_code': 400, 'result': 'not ok'}), 200  # missing arguments
     if User.query.filter_by(email=email).first() is not None:
-        abort(400)  # existing user
+        return jsonify({'error_code': 400, 'result': 'not ok'}), 200  # existing user
     user = User(email=email, first_name=first_name, last_name=last_name, phone=phone, city=city)
     user.hash_password(password)
     db.session.add(user)
     db.session.commit()
     information = response_builder(user, User, excluded=['password'])
-    return (jsonify({'status': 200, 'result': information}), 201,
+    return (jsonify({'error_code': 200, 'result': information}), 201,
             {'Location': url_for('.get_user', id=user.id, _external=True)})
 
 
@@ -48,7 +47,7 @@ def new_user():
 def update_user(id):
     user = User.query.get(id)
     if not user:
-        abort(400)
+        return jsonify({'error_code': 400, 'result': 'not ok'}), 200
     if request.json.get('email'):
         user.email = request.json.get('email')
     if request.json.get('password'):
@@ -65,25 +64,25 @@ def update_user(id):
     db.session.commit()
     user = User.query.get(id)
     information = response_builder(user, User, excluded=['password'])
-    return jsonify({'status': 200, 'result': information}), 200
+    return jsonify({'error_code': 200, 'result': information}), 200
 
 
-@mod.route('/users', methods=['GET'])
+@mod.route('/users/', methods=['GET'])
 def get_all_users():
     users = []
     for user in User.query.filter_by(is_deleted=0):
         information = response_builder(user, User, excluded=['password'])
         users.append(information)
-    return jsonify({'status': 200, 'result': users}), 200
+    return jsonify({'error_code': 200, 'result': users}), 200
 
 
 @mod.route('/users/<int:id>', methods=['GET'])
 def get_user(id):
     user = User.query.get(id)
     if not user:
-        abort(400)
+        return jsonify({'error_code': 400, 'result': 'not ok'}), 200
     information = response_builder(user, User, excluded=['password'])
-    return jsonify({'status': 200, 'result': information}), 200
+    return jsonify({'error_code': 200, 'result': information}), 200
 
 
 # User can delete only himself.
@@ -91,10 +90,10 @@ def get_user(id):
 def delete_user(id):
     user = User.query.get(id)
     if not user:
-        abort(400)
+        return jsonify({'error_code': 400, 'result': 'not ok'}), 200
     db.session.delete(user)
     db.session.commit()
-    return jsonify({'status': 200}), 200
+    return jsonify({'error_code': 200}), 200
 
 
 @mod.route('/token')

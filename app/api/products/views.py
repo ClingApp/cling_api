@@ -8,7 +8,7 @@ from app.api.users.model import User
 
 mod = Blueprint('products', __name__, url_prefix='/api/products')
 
-# {"title":"smth","price":"3000","description":"","user":"3"}
+# {"title":"smth","price":"3000","description":"","image":"", "user":"1"}
 @mod.route('/', methods=['POST'])
 def new_product():
     title = request.json.get('title')
@@ -17,7 +17,7 @@ def new_product():
     user = request.json.get('user')
     image = request.json.get('image')
     if title is None or price is None:
-        abort(400)  # missing arguments
+        return jsonify({'error_code': 400, 'result': 'not ok'}), 200  # missing arguments
     user_instance = User.query.get(user)
     product = Product(title=title, price=price, description=description, image=image, user_id=user_instance.id)
     db.session.add(product)
@@ -42,16 +42,16 @@ def update_product(id):
     db.session.commit()
     product = Product.query.get(id)
     information = response_builder(product, Product)
-    return jsonify({'status': 200, 'result': information}), 200
+    return jsonify({'error_code': 200, 'result': information}), 200
 
 
 @mod.route('/<int:id>', methods=['GET'])
 def get_product(id):
     product = Product.query.get(id)
     if not product:
-        abort(400)  # product with `id` isn't exist
+        return jsonify({'error_code': 400, 'result': 'not ok'}), 200  # product with `id` isn't exist
     information = response_builder(product, Product)
-    return jsonify({'status': 200, 'result': information}), 200
+    return jsonify({'error_code': 200, 'result': information}), 200
 
 
 @mod.route('/', methods=['GET'])
@@ -60,14 +60,14 @@ def get_all_products():
     for product in Product.query.filter_by(is_deleted=0):
         information = response_builder(product, Product)
         products.append(information)
-    return jsonify({'status': 200, 'result': products}), 200
+    return jsonify({'error_code': 200, 'result': products}), 200
 
 
 @mod.route('/<int:id>', methods=['DELETE'])
 def delete_product(id):
     product = Product.query.get(id)
     if not product:
-        abort(400)  # product with `id` isn't exist
+        return jsonify({'error_code': 400, 'result': 'not ok'}), 200  # product with `id` isn't exist
     db.session.delete(product)
     db.session.commit()
-    return jsonify({'status': 200}), 200
+    return jsonify({'error_code': 200}), 200
