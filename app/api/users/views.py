@@ -17,7 +17,7 @@ def verify_password(email_or_token, password):
         if not user or not user.verify_password(password):
             return False
     g.user = user
-    return True
+    return True 
 
 
 # need validate email ^(?("")("".+?""@)|(([0-9a-zA-Z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-zA-Z])@))(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,6}))$
